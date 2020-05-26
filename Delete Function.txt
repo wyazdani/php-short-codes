@@ -1,0 +1,8 @@
+<form action="{{ route('stores.destroy',$store->id) }}" method="POST">
+									<a class="icon-pencil text-success" href="{!! route('stores.edit',[get_role_slug(),$store->id]) !!}" ></a>
+
+
+									@csrf
+									@method('DELETE')
+									<button type="submit" class="btn btn-xxs btn-default"><a class=" icon-trash text-danger"></a></button>
+								</form>

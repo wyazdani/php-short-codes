@@ -1,0 +1,8 @@
+public function str_putcsv($input,$filename, $delimiter = ',', $enclosure = '"') {
+        $fp = fopen($filename, 'a');
+        fputcsv($fp, $input, $delimiter, $enclosure);
+        rewind($fp);
+        $data = rtrim(stream_get_contents($fp), "\n");
+        fclose($fp);
+        return $data;
+    }

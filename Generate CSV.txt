@@ -1,0 +1,49 @@
+public function generate_csv(Request    $request){
+
+
+
+        $user_table     =   get_table_name(User::class);
+        $ticket_table   =   get_table_name(TicketMaker::class);
+        $event_table   =   get_table_name(Event::class);
+        if ($request->event_slug){
+            $event                          =   Event::where('slug','=',$request->event_slug)
+                ->first();
+            $array=['Name','Email','Event'];
+            $users =   User::from($user_table.' as u')
+                ->leftJoin($ticket_table.' as tm','tm.user_uid','=','u.id')
+                ->leftJoin($event_table.' as e','tm.event_id','=','e.id')
+                ->where('tm.event_id','=',!empty($event)?$event->id:'')
+                ->select('u.name','u.email','e.name as event_name')
+                ->get();
+        }else{
+            $array=['Name','Email'];
+            $users =   User::from($user_table.' as u')
+                ->select('u.name','u.email')
+                ->get();
+        }
+        $this->str_putcsv($array,'users.csv',1);
+
+
+        foreach ($users   as $row_key=>$value){
+
+            $this->str_putcsv((array)$value->getAttributes(),'users.csv');
+        }
+        $headers = array(
+            'Content-Type' => 'text/csv',
+        );
+        /*return \Illuminate\Support\Facades\Response::download('scrape.csv', 'scrape.csv', $headers);*/
+        return response()->download('users.csv', 'users.csv', $headers);
+
+    }
+
+    public function str_putcsv($input,$filename,$truncate=0, $delimiter = ',', $enclosure = '"') {
+        $fp = fopen($filename, 'a');
+        if ($truncate>0){
+            ftruncate($fp, 0);
+        }
+        fputcsv($fp, $input, $delimiter, $enclosure);
+        rewind($fp);
+        $data = rtrim(stream_get_contents($fp), "\n");
+        fclose($fp);
+        return $data;
+    }

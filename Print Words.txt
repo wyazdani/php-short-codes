@@ -1,0 +1,7 @@
+function getExcerpt($text)
+{
+    $words_in_text = str_word_count($text,1);
+    $words_to_return = 100;
+    $result = array_slice($words_in_text,0,$words_to_return);
+    return '<em>'.implode(" ",$result).'</em>';
+}

@@ -1,0 +1,21 @@
+Eqoulent Mutator
+
+
+ public function setNameAttribute($value)
+    {
+
+        $slug = str_slug($value);
+        $slugs = $this->whereRaw("slug REGEXP '^{$slug}(-[0-9]*)?$'");
+
+        if ($slugs->count() === 0) {
+            $this->attributes['slug'] = $slug;
+        }
+        else {
+            $lastSlug = $slugs->orderBy('slug', 'desc')->first()->slug;
+            $lastSlugNumber = intval(str_replace($slug . '-', '', $lastSlug));
+            $slug= $slug . '-' . ($lastSlugNumber + 1);
+            $this->attributes['slug'] = $slug;
+        }
+        $this->attributes['name'] = $value;
+
+    }
